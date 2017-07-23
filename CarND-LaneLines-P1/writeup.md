@@ -41,9 +41,7 @@ This program works on the basic assumption that the polarity of the slope will a
  Equipped with *left_lane* slope, intercept and *right_lane* slope and intercept, we calculate the end points of our red line overlay. A horizon is a coordinate below which we detect lane marks. A suitable horizon in our sample images was observed to be 320px.  We draw left and right lane lines over the sample image.
 
 [//]: # (Image References)
-
-[a relative link](./examples/laneLines_thirdPass.jpg) 
-
+![Lane highlighted in red](./examples/laneLines_thirdPass.jpg "Lane detected")
 
 ### 2. Shortcomings
 
