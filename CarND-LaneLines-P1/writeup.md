@@ -8,9 +8,6 @@
  - A single overlay marker must cover the entire stretch of markers of a lane without disconnects.
  - Given a video clip of lanes, the output video should have the red line overlay for every frame of the video.
 
-[//]: # (Image References)
-
-[image1]: ./examples/grayscale.jpg "Grayscale"
 
 ---
 
@@ -43,7 +40,9 @@ This program works on the basic assumption that the polarity of the slope will a
  8. Draw lanes
  Equipped with *left_lane* slope, intercept and *right_lane* slope and intercept, we calculate the end points of our red line overlay. A horizon is a coordinate below which we detect lane marks. A suitable horizon in our sample images was observed to be 320px.  We draw left and right lane lines over the sample image.
 
-![alt text][image1]
+[//]: # (Image References)
+
+[image1]: ./examples/laneLines_thirdPass.jpg "It should look like this"
 
 
 ### 2. Shortcomings
