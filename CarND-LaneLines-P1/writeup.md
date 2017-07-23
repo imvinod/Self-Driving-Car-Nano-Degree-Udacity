@@ -42,7 +42,7 @@ This program works on the basic assumption that the polarity of the slope will a
 
 [//]: # (Image References)
 
-[image1]: ./examples/laneLines_thirdPass.jpg "It should look like this"
+[a relative link](./examples/laneLines_thirdPass.jpg) 
 
 
 ### 2. Shortcomings
