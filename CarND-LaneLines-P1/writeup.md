@@ -2,7 +2,7 @@
 
 ---
 
-##Goals
+## Goals
 
  - Detect and draw a red overlay lines on the lane markers from images.
  - A single overlay marker must cover the entire stretch of markers of a lane without disconnects.
@@ -34,16 +34,14 @@ This program works on the basic assumption that the polarity of the slope will a
 	 2. rho : The resolution of the parameter r in pixels. We use 1 pixel.
 	 3. threshold: The minimum number of intersections to “detect” a line.
 	 4. minLinLength: The minimum number of points that can form a line. Lines with less than this number of points are disregarded.
-	 5.     maxLineGap: The maximum gap between two points to be considered in the same line.
+	 5. maxLineGap: The maximum gap between two points to be considered in the same line.
  7. Average slopes from hough lines
  From Cartesian coordinate information from hough lines, we calculate slopes for all lines. We consider the negative slope lines to be from the left lane marks and the positive from the right lane lines and list them separately as *left_lane* list and right_lane list. We calculate the average slope and intercept of the left_lane list and *right_lane* list. 
  8. Draw lanes
  Equipped with *left_lane* slope, intercept and *right_lane* slope and intercept, we calculate the end points of our red line overlay. A horizon is a coordinate below which we detect lane marks. A suitable horizon in our sample images was observed to be 320px.  We draw left and right lane lines over the sample image.
 
 [//]: # (Image References)
-
-[image1]: ./examples/laneLines_thirdPass.jpg "It should look like this"
-
+![Lane highlighted in red](./examples/laneLines_thirdPass.jpg "Lane detected")
 
 ### 2. Shortcomings
 
