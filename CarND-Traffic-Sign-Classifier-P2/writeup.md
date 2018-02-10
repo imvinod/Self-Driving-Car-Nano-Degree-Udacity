@@ -17,7 +17,7 @@ The sections covered in this writeup are as following:
 
 ---
 
-##1. Load and Explore our Dataset
+## 1. Load and Explore our Dataset
 
 #### Loading the data
 We use [German Traffic Sign dataset](https://d17h27t6h515a5.cloudfront.net/topher/2017/February/5898cd6f_traffic-signs-data/traffic-signs-data.zip) for training and validation.
@@ -44,14 +44,14 @@ The below distribution histogram shows that the number of samples for each class
 
 ![Sample distribution](./visuals/sample_distributions.png)
 
-##2. Preprocess dataset for better results
+## 2. Preprocess dataset for better results
 
 There are many preprocessing techniques we can choose from. This [article](goo.gl/23S5wn) summarizes the most used preprocessing techniques.
 
 - We will choose not to Greyscale the images because we are not sure if different color backgrounds like yellow, blue or white has different meanings and that it may help network discern traffic signs better.
 - We will use Normalization as opposed to Standardization
 
-  ![Narmalization mathematical formula](./normalization.png) <br>
+  ![Narmalization mathematical formula](./visuals/normalization.png) <br>
 
   Normalization is one of the feature scaling methods. Normalised data improves convergence during Gradient descent. Although image features are always in the range of [0-255] without any scope for outliers, it is observed that normalizing an image considerably improves performance.
 - Data Augmentation helps us increase our training sample size with additional distorted images. Collecting training data is time consuming and a costly affair. Data Augmentation has proven to be a easier alternative to an extent. We will use Keras's [ImageDataGenerator](https://keras.io/preprocessing/image/) for data Augmentation. This library provides option to distort image in several ways.
@@ -87,7 +87,7 @@ Notice the distortions generated using ImageDataGenerator on sample images from 
 - Blog on Keras [ImageDataGenrator](https://towardsdatascience.com/image-augmentation-for-deep-learning-using-keras-and-histogram-equalization-9329f6ae5085)
 
 
-## 2. Design, train and test a model architecture
+## 3. Design, train and test a model architecture
 
 #### Design Model Architecture
 
@@ -168,7 +168,7 @@ It is surprising that despite being trained on comparitively smaller training ex
 - A bigger network.
 - Training longer.
 
-The other problem is that our test images come from a different distribution than the ones from German Traffic sign dataset. The test images from the web may have different characteristics like light, angle, zoom, image centre offset etc. that contribute to deteriorated performace.
+The other problem is that our test images come from a different distribution than the ones from German Traffic sign dataset. The test images from the web may have different characteristics like light, aangle, zoom, image centre offset etc. that contribute to deteriorated performace.
 
 Watch Prof. Andrew Ng's lesson on [Bias and Variance with mismatched data distribution](https://www.coursera.org/learn/machine-learning-projects/lecture/ht85t/bias-and-variance-with-mismatched-data-distributions)
 
@@ -179,9 +179,16 @@ Watch Prof. Andrew Ng's lesson on [Bias and Variance with mismatched data distri
 
 |  Image | Probability  |     Prediction	         |
 |:------:|:------------:|:------------------------:|
-| ![](./new_signs_rare/straight_or_left.png) |  0.00122 <br>  0.74575 <br> 0.24819 <br> 0.0 <br> 0.00305 | Ahead only <br> Go straight or left <br>Turn left ahead <br> Go straight or right <br>Keep right|
-| ![](./new_signs_rare/curve_right.png) |  0.01173 <br> 0.98826 <br> 0.0 <br> 0.0 <br> 0.0 | Dangerous curve to the right <br> Traffic signals <br>Road work <br> Children crossing <br>General caution|
-| ![](./new_signs_rare/roundabout.png) |  0.02439 <br> 0.92278 <br> 0.0 <br> 0.0 <br> 0.00038 | Keep right <br> Roundabout mandatory <br>Speed limit (70km/h) <br> Wild animals crossing <br>Go straight or right|
-| ![](./new_signs_rare/end_limits.png) |  0.92966 <br> 0.07033<br> 0.0 <br> 0.0 <br> 0.0 | End of all speed and passing limits <br> End of no passing <br>Traffic signals (70km/h) <br> End of speed limit (80km/h) <br>No passing|
-| ![](./new_signs_rare/slippery_road.png) |  0.0 <br> 0.0<br>0.90572<br> 0.0523 <br> 0.0 | Slippery road <br> Wild animals crossing <br>Bicycles crossing (70km/h) <br> Dangerous curve to the right <br>Double curve|
-| ![](./new_signs_rare/bumpy_road.png) |  0.1 <br> 0.0 <br> 0.0 <br> 0.0 <br> 0.0 | Bumpy road <br> Slippery road <br>Bicycles crossing <br> No vehicles <br>Dangerous curve to the left|
+|Go straight or left  <br> <br> ![](./new_signs_rare/straight_or_left.png) |  0.00122 <br>  0.74575 <br> 0.24819 <br> 0.0 <br> 0.00305 | Ahead only <br> **Go straight or left**  <br>Turn left ahead <br> Go straight or right <br>Keep right|
+| Dangerous curve to the right <br> <br> ![](./new_signs_rare/curve_right.png) |  0.01173 <br> 0.98826 <br> 0.0 <br> 0.0 <br> 0.0 | Dangerous curve to the right <br> **Traffic signals** <br>Road work <br> Children crossing <br>General caution|
+| Roundabout mandatory <br> <br> ![](./new_signs_rare/roundabout.png) |  0.02439 <br> 0.92278 <br> 0.0 <br> 0.0 <br> 0.00038 | Keep right <br> **Roundabout mandatory** <br>Speed limit (70km/h) <br> Wild animals crossing <br>Go straight or right|
+|End of all speed and passing limits <br> <br> ![](./new_signs_rare/end_limits.png) |  0.92966 <br> 0.07033<br> 0.0 <br> 0.0 <br> 0.0 | **End of all speed and passing limits** <br> End of no passing <br>Traffic signals (70km/h) <br> End of speed limit (80km/h) <br>No passing|
+| Slippery road  <br> <br> ![](./new_signs_rare/slippery_road.png) |  0.0 <br> 0.0<br>0.90572<br> 0.0523 <br> 0.0 | Slippery road <br> Wild animals crossing <br>**Bicycles crossing** <br> Dangerous curve to the right <br>Double curve|
+| Bumpy road  <br> <br> ![](./new_signs_rare/bumpy_road.png) |  0.1 <br> 0.0 <br> 0.0 <br> 0.0 <br> 0.0 | **Bumpy road** <br> Slippery road <br>Bicycles crossing <br> No vehicles <br>Dangerous curve to the left|
+
+1. Gets 'Go straight or left' correct. The second probablity is 'Turn left ahead' which makes sense because the Traffic sign in question actually shows arrows in both left and ahead direction.
+2. Gets 'Dangerous curve to the right' wrong. The correct label has a probablity of about 1% whereas the wrong prediction of 'Traffic signals' has a probablity of 98%.
+3. Gets 'Roundabout mandatory' correct with 92% confidence.
+4. Gets 'End of all speed and passing limits' correct. The second guess with 7% confidence is 'End of No passing' which makes sense because both of these signs have a noticable grey colored diognal marks.
+5. Gets 'Slippery road' wrong. Guesses it to be 'Bycycle crossing' with 90% confidence and 0% confidence on the correct label. The image relsolution is poor for even humans to discern.
+6. Gets 'Bumpy road' with a perfect 100%.
