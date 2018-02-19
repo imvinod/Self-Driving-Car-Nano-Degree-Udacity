@@ -1,10 +1,10 @@
 # **Behavioral Cloning**
 
 The goals of this project are the following:
-* Use the simulator to collect data of good driving behavior and Recovery behavior.
-* Build, a Nvidia end-end convolution neural network in Keras that predicts steering angles from images.
-* Train and validate the model with a training and validation set
-* Test that the model successfully drives around track one without leaving the road
+1. Use the simulator to collect data of good driving behavior and Recovery behavior.
+2. Build, a Nvidia end-end convolution neural network in Keras that predicts steering angles from images.
+3. Train and validate the model with a training and validation set
+4. Test that the model successfully drives around track one without leaving the road
 
 ---
 ### Introduction
@@ -18,7 +18,7 @@ This is arguably the most crucial part of this project. I found that tuning the 
 
 Having not played a video game ever since NFS, I immediately started driving around on the simulator with my keyboard. I recorded driving in the forward as well as opposite direction so that the model will have data to better generalize to different circumstances. I also collected Recovery data. Recovery is a situation where your car is on the edge and you bring it to the center of the track where it should ideally drive along. If the model finds itself being on the edge, it will have an opportunity to lear how to get back to the center from the Recovery data.
 
-<center>Recovery Image</center>
+#### An image from Recovery data
 <p style="text-align:center;">
 <img src="./img/recovery.jpg?raw=true"center=True width="300px"></p>
 
@@ -26,7 +26,7 @@ However, the data I collected performed poorly on the same model that worked wel
 
 I decided to go with Udacity data combined with recovery data. This is how the data distribution looks like.
 
-<center>Udacity data and recovery data combined distribution</center>
+#### Udacity data and recovery data combined distribution
 <p style="text-align:center;">
 <img src="./img/udacity_and_mouse_recovery.png?raw=true"center=True width="400px"></p>
 
@@ -40,21 +40,21 @@ There are three cameras, center, left and right. Steering angle is provided only
 
 Images are of size 320x160. The top portion is just trees and rocks that provide no beneficial information but only distracts the model. The bonnet of the car is also visible. So we remove top 50 an bottom 20 pixels from the image. We also resize it to 200x66 as required by the Nvidia model.
 
-<center>Orignal images</center>
+#### Orignal images
 <p style="text-align:center;">
 <img src="./img/orignal.png?raw=true" width="900px"></p>
 
-<center>Cropped images</center>
+#### Cropped images
 <p style="text-align:center;">
 <img src="./img/cropped.png?raw=true" width="900px"></p>
 
 In order to reduce the model's tendency to over-fit the data, we try to perturb the images. The first option I used was to randomly change the brightness of the image. This helps model be robust to changes in lighting conditions. The second option is to use Gaussian blur. This helps model to be robust against the minute details but focus on the structure.
 
-<center>Random Brightness</center>
+#### Random Brightness
 <p style="text-align:center;">
 <img src="./img/brightness1.png?raw=true" width="900px"></p>
 
-<center>Random Blurring</center>
+#### Random Blurring
 <p style="text-align:center;">
 <img src="./img/blur1.png?raw=true" width="900px"></p>
 
@@ -62,11 +62,44 @@ In order to reduce the model's tendency to over-fit the data, we try to perturb 
 
 I decided to go with Nvidia model straight away as suggested in the course. The model architecture is as shown below.
 
-<center>Nvidia model</center>
+#### Nvidia model
 <p style="text-align:center;">
 <img src="./img/nvidia.png?raw=true" width="400px"></p>
 
 The first layer is the normalization layer. Normalization helps optimizer converge to the minima faster. This is followed by three Convolution layers with 5x5 filters with glorot_uniform (Also called Xavier Initialization).Three Convolution layers with 3x3 filters follow. The output of the convolution layer is flattened and fully connected with dropout before each layer for Regularization. The final layer is a single neuron that outputs single value estimate of the steering angle. We play around with keep_probablity later. We use ELU for activation function and Adam for optimizer. The loss function is MSE (Mean squared error) best suited for regression problems. Nvidia paper suggests converting your RGB image to YUV color space but I found it to deteriorate performance.
+
+#### Model Summary
+
+|Layer (type)                    |      Output Shape  | Param # |    Connected to            |
+|--------------------------------|--------------------|---------|----------------------------|
+|lambda_1 (Lambda)               | (None, 66, 200, 3) |   0     |    lambda_input_1[0][0]    |
+|convolution2d_1 (Convolution2D) | (None, 31, 98, 24) |   1824  |      lambda_1[0][0]        |
+|elu_1 (ELU)                     | (None, 31, 98, 24) |   0     |      convolution2d_1[0][0] |
+|dropout_1 (Dropout)             | (None, 31, 98, 24) |   0     |      elu_1[0][0]           |
+|convolution2d_2 (Convolution2D) | (None, 14, 47, 36) |   21636 |      dropout_1[0][0]       |
+|elu_2 (ELU)                     | (None, 14, 47, 36) |   0     |      convolution2d_2[0][0] |
+|dropout_2 (Dropout)             | (None, 14, 47, 36) |   0     |      elu_2[0][0]           |
+|convolution2d_3 (Convolution2D) | (None, 5, 22, 48)  |   43248 |      dropout_2[0][0]       |
+|elu_3 (ELU)                     | (None, 5, 22, 48)  |   0     |      convolution2d_3[0][0] |
+|dropout_3 (Dropout)             | (None, 5, 22, 48)  |   0     |      elu_3[0][0]           |
+|convolution2d_4 (Convolution2D) | (None, 3, 20, 64)  |   27712 |      dropout_3[0][0]       |
+|elu_4 (ELU)                     | (None, 3, 20, 64)  |   0     |      convolution2d_4[0][0] |
+|dropout_4 (Dropout)             | (None, 3, 20, 64)  |   0     |      elu_4[0][0]           |
+|convolution2d_5 (Convolution2D) | (None, 1, 18, 64)  |   36928 |      dropout_4[0][0]       |
+|elu_5 (ELU)                     | (None, 1, 18, 64)  |   0     |      convolution2d_5[0][0] |
+|dropout_5 (Dropout)             | (None, 1, 18, 64)  |   0     |      elu_5[0][0]           |
+|flatten_1 (Flatten)             | (None, 1152)       |   0     |      dropout_5[0][0]       |
+|dense_1 (Dense)                 | (None, 100)        |   115300|      flatten_1[0][0]       |
+|elu_6 (ELU)                     | (None, 100)        |   0     |      dense_1[0][0]         |
+|dropout_6 (Dropout)             | (None, 100)        |   0     |      elu_6[0][0]           |
+|dense_2 (Dense)                 | (None, 50)         |   5050  |      dropout_6[0][0]       |
+|elu_7 (ELU)                     | (None, 50)         |   0     |      dense_2[0][0]         |
+|dropout_7 (Dropout)             | (None, 50)         |   0     |      elu_7[0][0]           |
+|dense_3 (Dense)                 | (None, 10)         |   510   |      dropout_7[0][0]       |
+|elu_8 (ELU)                     | (None, 10)         |   0     |      dense_3[0][0]         |
+|dense_4 (Dense)                 | (None, 1)          |   11    |      elu_8[0][0]           |
+
+Total params: 252,219 , Trainable params: 252,219 , Non-trainable params: 0
 
 ### 3. Training and Validation
 
@@ -78,35 +111,40 @@ We save the model in .h5 format. The model file is passed as argument to drive s
 
 Below is a table of a handful of my trails from my training efforts.
 
-| Data                                                                                                        | Cameras            | Fliped          | Blur          | Random <br>Brightness | Dropout | Epoch | Result                                                                                                           |
+| Data                                                                                                        | Cameras            | Fliped          | Blur          | Random <br> Brightness | Dropout | Epoch | Result                                                                                                           |
 |-------------------------------------------------------------------------------------------------------------|--------------------|-----------------|---------------|------------------------|---------|-------|------------------------------------------------------------------------------------------------------------------|
-| Keyboard, forward and opposite <br/> Train: 3000 Val:766                                                      | Front              | No              | No            | No                     | 0.5     | 3     | 9mph Smooth, dives into the river                                                                                |
-| Keyboard <br/> Train: 3000 Val:766                                                                             | Front              | No              | No            | No                     | 0.5     | 7     | 9mph Wobbly, into the river                                                                                      |
-| Keyboard <br/> Train: 3000 Val:766                                                                             | Front              | No              | No            | No                     | 0.5     | 10    | Wobbly, makes it until bridge                                                                                    |
-| Keyboard <br/>Train: 3000 Val:766 <br/>Cropped top 50 and lower 20                                               | Front              | No              | No            | No                     | 0.5     | 15    | Into the river                                                                                                   |
-| Keyboard-forward and opposite <br/> Train: 3000 Val:766 <br/> Cropped top 50 and lower 20                          | Left, Front, Right | No              | No            | No                     | 0.5     | 15    | Into the river                                                                                                   |
-| Keyboard-forward and opposite <br/>Train: 3000 Val:766 Cropped top 50 and lower 20                           | Left, Front, Right | Yes <br/> 50% | No            | No                     | 0.5     | 7     | Worse, Left biased, Into the river                                                                               |
-| Keyboard-forward and opposite <br/>Train: 3000 Val:766 Cropped top 50 and lower 20                           | Left, Front, Right | Yes <br/> 50% | No            | No                     | 0.5     | 15    | Worse than prior, Into the river                                                                                 |
-| Udacity data<br/> Cropped top 50 and lower 20 <br/> Train:6428 Val: 1608                                          | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Hits the bridge                                                                                                  |
-| Udacity data <br/> Cropped top 50 and lower 20 <br/> Kept 20% of data with angle 0.0 <br/> Train:4428 Val: 1107        | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Hits bridge but Reaches goal                                                                                     |
-| Udacity data and Keyboard data <br/> Cropped top 50 and lower 20 <br/> Train 7400 Val: 1900                       | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Worse than just alone with Udacity data                                                                          |
-| Udacity data and Keyboard Recovery data <br/> Cropped top 50 and lower 20 <br/> Train 7400 Val: 1900                | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Reaches goal but not smooth                                                                                      |
-| Udacity data and Keyboard Recovery data<br/> Cropped top 50 and lower 20<br/> Train 7400 Val: 1900                | Left, Front, Right | No              | No            | Yes                    | 0.5     | 3     | Wobbly, Fell into the ditch                                                                                      |
-| Udacity data and Keyboard Recovery data<br/> Cropped top 50 and lower 20<br/> Train 7400 Val: 1900                | Left, Front, Right | No              | No            | Yes                    | 0.5     | 20    | Wobbly, Fell into the ditch                                                                                      |
-| Udacity data and Keyboard Recovery data<br/> Cropped top 50 and lower 20<br/> Train 7400 Val: 1900                | Left, Front, Right | No              | Yes | No                     | 0.5     | 3     | Wobbly, Fell into the ditch                                                                                      |
-| Data captured with mouse <br/>Cropped top 50 and lower 20 <br/> Train 6000 Val: 1500                                  | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Left biased, Fell into the ditch                                                                                 |
-| Data captured with mouse <br/>Cropped top 50 and lower 20 <br/> Train 6000 Val: 1500                                  | Left, Front, Right | Yes             | No            | No                     | 0.5     | 7     | Right biased, Fell into the ditch                                                                                |
-| Udacity data and Recovery data captured with mouse. <br/> Cropped top 50 and lower 20 <br/> Train: 7648 Val: 1912 | Left, Front, Right | No              | No            | No                     | 0.5     | 7     | Track 1: Reaches goal smoothly at 9mph and 20 mph<br/> Track 2: Left biased, travels a bit, hits a rock wall.   |
-| Udacity data and Recovery data captured with mouse.<br/>Cropped top 50 and lower 20<br/> Train: 7648 Val: 1912   | Left, Front, Right | No              | Yes           | No                     | 0.5     | 7     | Track 1: Reaches goal smoothly at 9mph <br/> Track 2: Left biased, travels a bit, hits a rock wall.            |
-| Udacity data and Recovery data captured with mouse.<br/> Cropped top 50 and lower 20<br/> Train: 7648 Val: 1912   | Left, Front, Right | No              | Yes           | Yes                    | 0.5     | 7     | Track 1: Reaches goal smoothly at 9mph<br/> Track 2: Left biased, little better, hits a rock wall.                   |
-| Udacity data and Recovery data captured with mouse.<br/> Cropped top 50 and lower 20<br/> Train: 7648 Val: 1912   | Left, Front, Right | No              | Yes           | Yes                    | 0.2     | 7     | Track 1: Reaches goal but bit wobbly at 9mph<br/> Track 2: Left biased, almost same as before, hits a rock wall.     |
-| Udacity data and Recovery data captured with mouse.<br/> Cropped top 50 and lower 20<br/> Train: 7648 Val: 1912   | Left, Front, Right | Yes             | Yes           | Yes                    | 0.2     | 7     | Track 1: Dives into the lake <br/> Track 2: Left biased, Worse than earlier.                                         |
-| Udacity data and Recovery data captured with mouse.<br/> Cropped top 50 and lower 20<br/> Train: 7648 Val: 1912   | Left, Front, Right | No              | Yes           | Yes                    | 0.5     | 7     | Track 1: Reaches goal smoothly at 9mph and 20 Mph <br/>Track 2: Left biased, hits a rock wall. |
+| - Keyboard, forward and opposite - Train: 3000 Val:766                                                      | Front              | No              | No            | No                     | 0.5     | 3     | 9mph Smooth, dives into the river                                                                                |
+| - Keyboard- Train: 3000 Val:766                                                                             | Front              | No              | No            | No                     | 0.5     | 7     | 9mph Wobbly, into the river                                                                                      |
+| - Keyboard- Train: 3000 Val:766                                                                             | Front              | No              | No            | No                     | 0.5     | 10    | Wobbly, makes it until bridge                                                                                    |
+| - Keyboard- Train: 3000 Val:766 - Cropped top 50 and lower 20                                               | Front              | No              | No            | No                     | 0.5     | 15    | Into the river                                                                                                   |
+| - Keyboard-forward and opposite - Train: 3000 Val:766- Cropped top 50 and lower 20                          | Left, Front, Right | No              | No            | No                     | 0.5     | 15    | Into the river                                                                                                   |
+| - Keyboard-forward and opposite - Train: 3000 Val:766 Cropped top 50 and lower 20                           | Left, Front, Right | Yes, Random 50% | No            | No                     | 0.5     | 7     | Worse, Left biased, Into the river                                                                               |
+| - Keyboard-forward and opposite - Train: 3000 Val:766 Cropped top 50 and lower 20                           | Left, Front, Right | Yes, Random 50% | No            | No                     | 0.5     | 15    | Worse than prior, Into the river                                                                                 |
+| - Udacity data- Cropped top 50 and lower 20 - Train:6428 Val: 1608                                          | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Hits the bridge                                                                                                  |
+| - Udacity data- Cropped top 50 and lower 20 - Kept 20% of data with angle 0.0 - Train:4428 Val: 1107        | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Hits bridge but Reaches goal                                                                                     |
+| - Udacity data and Keyboard data - Cropped top 50 and lower 20 - Train 7400 Val: 1900                       | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Worse than just alone with Udacity data                                                                          |
+| - Udacity data and Keyboard Recovery data- Cropped top 50 and lower 20- Train 7400 Val: 1900                | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Reaches goal but not smooth                                                                                      |
+| - Udacity data and Keyboard Recovery data- Cropped top 50 and lower 20- Train 7400 Val: 1900                | Left, Front, Right | No              | No            | Yes                    | 0.5     | 3     | Wobbly, Fell into the ditch                                                                                      |
+| - Udacity data and Keyboard Recovery data- Cropped top 50 and lower 20- Train 7400 Val: 1900                | Left, Front, Right | No              | No            | Yes                    | 0.5     | 20    | Wobbly, Fell into the ditch                                                                                      |
+| - Udacity data and Keyboard Recovery data- Cropped top 50 and lower 20- Train 7400 Val: 1900                | Left, Front, Right | No              | Guassian blur | No                     | 0.5     | 3     | Wobbly, Fell into the ditch                                                                                      |
+| -Data captured with mouse-Cropped top 50 and lower 20-Train 6000 Val: 1500                                  | Left, Front, Right | No              | No            | No                     | 0.5     | 3     | Left biased, Fell into the ditch                                                                                 |
+| -Data captured with mouse-Cropped top 50 and lower 20-Train 6000 Val: 1500                                  | Left, Front, Right | Yes             | No            | No                     | 0.5     | 7     | Right biased, Fell into the ditch                                                                                |
+| - Udacity data and Recovery data captured with mouse. - Cropped top 50 and lower 20 - Train: 7648 Val: 1912 | Left, Front, Right | No              | No            | No                     | 0.5     | 7     | Track 1: Reaches goal smoothly at 9mph and 20 mph Track 2: Left biased, travels a bit, hits a rock wall.   |
+| - Udacity data and Recovery data captured with mouse.- Cropped top 50 and lower 20- Train: 7648 Val: 1912   | Left, Front, Right | No              | Yes           | No                     | 0.5     | 7     | Track 1: Reaches goal smoothly at 9mph - Track 2: Left biased, travels a bit, hits a rock wall.            |
+| - Udacity data and Recovery data captured with mouse.- Cropped top 50 and lower 20- Train: 7648 Val: 1912   | Left, Front, Right | No              | Yes           | Yes                    | 0.5     | 7     | Track 1: Reaches goal smoothly at 9mph- Track 2: Left biased, little better, hits a rock wall.                   |
+| - Udacity data and Recovery data captured with mouse.- Cropped top 50 and lower 20- Train: 7648 Val: 1912   | Left, Front, Right | No              | Yes           | Yes                    | 0.2     | 7     | Track 1: Reaches goal but bit wobbly at 9mph- Track 2: Left biased, almost same as before, hits a rock wall.     |
+| - Udacity data and Recovery data captured with mouse.- Cropped top 50 and lower 20- Train: 7648 Val: 1912   | Left, Front, Right | Yes             | Yes           | Yes                    | 0.2     | 7     | Track 1: Dives into the lake - Track 2: Left biased, Worse than earlier.                                         |
+| - Udacity data and Recovery data captured with mouse.- Cropped top 50 and lower 20- Train: 7648 Val: 1912   | Left, Front, Right | No              | Yes           | Yes                    | 0.5     | 7     | Track 1: Reaches goal smoothly at 9mph and 20 Mph - Track 2: Left biased, hits a rock wall. |
 
 
 ### 4. Test and results
 
 Although, there is a lot of improvements we can make to the model on various fronts, the model successfully completes Track 1 for several laps at 20 mph. It reaches a distance on track 2 before crashing into the wall.
+
+#### Loss curve for the latest iteration of the Model
+<p style="text-align:center;">
+<img src="./img/loss.png?raw=true" width="400px"></p>
+
 
 #### Scope for improvement
 - The major take away from this project is that I appreciate an appropriate amount the importance of a well balanced data. A model can only be tuned so much. Without a dataset of a balanced distribution, the model would not perform to its best potential. I found that the data collected from my keyboard performed bad with the same model that works great on Udacity data. Data collected using mouse performed better than keyboard collected data. Studying data distribution is a promising avenue. If data points are concentrated disproportionately on one direction, the model tends to favor more towards it even when it isn't the appropriate action. However, tailoring the data distribution to work well on a particular track will result in model performing worse on a different track. A mask of finely balanced proportion for each steering angles that works well for both the tracks may come handy during data collection. Instead of blindly discarding a chunk of data, it may be useful to get more data to compensate for the bias in the proportion. Multiplying this mask with any dataset should tell us the gaps in the dataset proportions.
