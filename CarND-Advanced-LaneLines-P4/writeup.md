@@ -30,7 +30,8 @@ We can remove both the distortions by calculating distortion coefficients **[k1,
 ![Undistorted chessboard](./output_images/chessboard_undistorted.png)
 
 #### 2. Example of a distortion-corrected image.
-Having obtained correction coefficients, We can undistort any and every image taken from this particular camera. Using `cv2.undistort()`, this test image was undistorted.<br>
+Having obtained correction coefficients, We can undistort any and every image taken from this particular camera. Using `cv2.undistort()`, this test image was undistorted.
+
 ![Undistorted Test Image](./output_images/undistorted1.png)
 
 #### 3. Create a thresholded binary image with color transforms and gradients.
@@ -39,34 +40,32 @@ Having obtained correction coefficients, We can undistort any and every image ta
 2. We threshold the S channel remove some finer noise.
 3. We apply Sobel filter on gray undistorted image in both X and Y orientation and threshold thereafter.
 4. We combine thresholded S channel, thresholded Sobel XY. This effectively removes some fine noise and detects the lanes better.<br>
+
 ![Filtered Image](./output_images/sobelxy_s.png)
 
 #### 4. Perspective transform.
 Perspective transform gives a bird's eye view which helps us determine the actual curvature of the lane.
 1. We pick four points of interest in the src array. We pick four points where we would like the points of interest to be mapped to. <br>
   ```python
-  src = np.float32([[540, 480],
-  			     [745, 480],
-                             [1130, 720],
-                             [180, 720]])
-  dst = np.float32([[200, 0], 
-  			     [img_size[0]-200, 0],
-                  	     [img_size[0]-200, img_size[1]],
-                  	     [200, img_size[1]]])
+  src = np.float32([[540, 480],  [745, 480], [1130, 720], [180, 720]])
+  dst = np.float32([[200, 0], [img_size[0]-200, 0], [img_size[0]-200, img_size[1]], [200, img_size[1]]])
   ```
 2. OpenCV provides `cv2.getPerspectiveTransform(src,dst)` that returns `M` the tranformation matrix.
 3. We use `cv2.warpPerspective(img, M, size, flags=cv2.INTER_LINEAR)` to get a warped image.
 4. We may also unwarp the warped image. We get `M inverse` transformation matrix with the same function `cv2.getPerspectiveTransform(dst,src)` with src and dst arrays swaped in the parameters. As in previous step we may use `M inverse` to unwarp a warped image.<br>
+
 ![Perspective Image](./output_images/perspective.png)
 
 The lanes appear to be converging to a point in the distance on the orignal image. After transformation, you can see that the lanes are parallel.
 
 #### 5. Identified lane-line pixels and fit their positions with a polynomial.
 1. Take a histogram of the bottom half of the binary warped image. Pick two peaks of the histogram from the midpoint assign to right and left base. <br>
+  
   ![histogram points](./output_images/base_points_hist.png)
 2. The image is divided into nwindows in y axis. In a loop of length nwindows, from the left and right base points, with a margin of 100px, append all the non zero pixels within the window to lists `lefty,leftx,righty,rightx`. Take mean of these pixels which will be your new base value and repeat.
 3. Fit a second degree polynomial using these points with `np.polyfit(lefty,leftx)` and `np.polyfit(righty,rightx)` assigned to `left_fit` and `right_fit`.
 4. We also map the polyfits into meters `left_fit_m` and `right_fit_m` by multiplying with coefficients `ym_per_pix` and `xm_per_pix` which are meters per pixel in x and y respectively.<br>
+
 ![Points window lines](./output_images/window_line_points.png)
 The plot on the left depicts a warped binary image and the one on the right highlights the nonzero pixel points in Red and blue. It encloses the windows with green boxes. The yellow line fits the nonzero points with minimun squared distance error.
 <br>
